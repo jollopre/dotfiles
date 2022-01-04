@@ -1,0 +1,5 @@
+[user]
+	name = Jose Lloret
+	email = jollopre@gmail.com
+[includeIf "gitdir:~/gitlab/"]
+	path = ~/flywire/.gitconfig
