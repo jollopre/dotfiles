@@ -1,2 +1,6 @@
 Brewfile.lock.json
-!flywire/**/*.gpg
+.gitsecret/keys/random_seed
+!*.secret
+flywire/tokens.sh
+flywire/.aws/config
+flywire/.extended-routes

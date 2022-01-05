@@ -7,12 +7,10 @@
 brew bundle
 
 # Copy flywire related stuff
+git-secret reveal
 cp -R flywire ~
-gpg -o ~/flywire/.extended-routes -d ~/flywire/.extended-routes.gpg
 ln -s ~/flywire/.extended-routes ~
-gpg -o ~/flywire/.aws/config -d ~/flywire/.aws/config.gpg
 ln -s ~/flywire/.aws ~
-gpg -o ~/flywire/tokens.sh -d ~/flywire/tokens.sh.gpg
 ln -s ~/flywire/tokens.sh ~
 
 # Copy .zshrc

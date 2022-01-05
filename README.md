@@ -15,13 +15,27 @@ git clone git@github.com:jollopre/dotfiles.git ~/dotfiles
 sh ~/dotfiles/install.sh
 ```
 
-## Encrypt files
+## Encrypt data
 
-It is used `gnupg` for encrypting/decrypting with symmetric AES cipher. For instance, in order
-to encrypt a file use the following command:
+We use [git-secret](https://git-secret.io/) to store secrets that otherwise would be compromissed
+within git versioning. Make sure that public/private [gpg](https://www.gnupg.org/) keys are stored in the machine beforehand.
+
+### New file to be added
+
+In order to add a new file for encrypting, you can type the following:
 
 ```bash
-gpg --symmetric --cipher-algo AES256 file.txt
+# Add file to the index of files tracked to be encrypted
+git-secret add <filename>
+# Encrypts all the files that have been added
+git-secret hide
 ```
 
-This will create file.txt.gpg under the same directory with the passphrase typed
+### Update existing file
+
+In order to encrypt an update file, you can modify the file as always but make sure to type:
+
+```bash
+git-secret hide
+```
+once is done, followed by a new commit into this repository :).
