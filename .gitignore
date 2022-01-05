@@ -1,0 +1,6 @@
+Brewfile.lock.json
+.gitsecret/keys/random_seed
+!*.secret
+flywire/tokens.sh
+flywire/.aws/config
+flywire/.extended-routes

@@ -22,6 +22,8 @@ set smartindent	" Enable smart-indent
 set smarttab	" Enable smart-tabs
 set softtabstop=2	" Number of spaces per Tab
 set encoding=utf-8
+set foldmethod=syntax " permits folding a block by its syntax inferred
+set nofoldenable " folding is disabled implicitly
 syntax on " Enable syntax highlighting
 
 " Advanced
@@ -64,3 +66,4 @@ endtry
 nnoremap <c-p> :FZF<CR>
 nnoremap <c-f> :Ag<CR>
 nnoremap <c-n> :NERDTreeToggle<CR>
+nnoremap <c-b> :!git blame %:p<CR>
