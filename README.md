@@ -4,13 +4,29 @@ This repository contains my personal config files. This assumes a configuration 
 
 ## Quick Start
 
-Installation requires `git`.
+Installation requires [git](https://git-scm.com/) and [gpg](https://gnupg.org/).
 
 1. Clone this repository:
 ```bash
 git clone git@github.com:jollopre/dotfiles.git ~/dotfiles
 ```
-2. Install applications through `brew` as well as dotfiles
+
+2. Import public and private gpg keys from the backup in place:
+```
+# Decrypt the keys using the memorable passphrase
+gpg -o private.key -d private.key.gpg
+gpg -o public.key -d public.key.gpg
+
+# Import the keys into gpg
+gpg --allow-secret-key-import --import private.key
+gpg --import public.key
+
+# Check keys are properly imported
+gpg --list-secret-keys
+gpg --list-keys
+```
+
+3. Run install script
 ```bash
 sh ~/dotfiles/install.sh
 ```
@@ -33,9 +49,25 @@ git-secret hide
 
 ### Update existing file
 
-In order to encrypt an update file, you can modify the file as always but make sure to type:
+In order to encrypt an updated file, you can modify the file as always but make sure to type:
 
 ```bash
 git-secret hide
 ```
-once is done, followed by a new commit into this repository :).
+and remember, once you are done, please push changes back to this repository :).
+
+## Backup gpg keys
+
+1. Export keys from gpg:
+```bash
+gpg --export-secret-keys <key_id> > private.key
+gpg --export <key_id> > public.key
+```
+
+2. Encrypt them with a passphrase, remember to use something memorable:
+```bash
+gpg --symmetric --cipher-algo AES256 private.key
+gpg --symmetric --cipher-algo AES256 public.key
+```
+
+3. Store the encrypted keys into a safe place, remember the files ending with `.gpg` ONLY.
