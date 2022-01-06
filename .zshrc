@@ -4,7 +4,7 @@ cdpath=(~/gitlab ~/github)
 
 # Environment variables
 export PATH="/opt/homebrew/bin:$PATH"
-source ~/tokens.sh
+source ~/.tokens.sh
 
 # oh-my-zsh setup
 export ZSH=$HOME/.oh-my-zsh

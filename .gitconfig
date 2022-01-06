@@ -1,5 +1,7 @@
 [user]
-	name = Jose Lloret
-	email = jollopre@gmail.com
+  name = Jose Lloret
+  email = jollopre@gmail.com
+[init]
+  defaultBranch = main
 [includeIf "gitdir:~/gitlab/"]
-	path = ~/flywire/.gitconfig
+  path = ~/flywire/.gitconfig
