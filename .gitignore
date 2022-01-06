@@ -4,3 +4,5 @@ Brewfile.lock.json
 flywire/.aws/config
 flywire/.extended-routes
 flywire/.tokens.sh
+.ssh/id_rsa
+.ssh/id_rsa.pub
