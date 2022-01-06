@@ -10,8 +10,10 @@ brew bundle
 mkdir -p ~/github
 mkdir -p ~/gitlab
 
-# Copy flywire related stuff
+# Reveal every secret so that it can be properly placed within the machine
 git-secret reveal
+
+# Copy flywire related stuff
 cp -R flywire ~
 ln -s ~/flywire/.extended-routes ~
 ln -s ~/flywire/.aws ~
@@ -22,6 +24,9 @@ cp .zshrc ~
 
 # Copy gitconfig
 cp .gitconfig ~
+
+# Copy .ssh
+cp -R .ssh ~
 
 # Install vim
 cp .vimrc ~

@@ -12,6 +12,9 @@ rm ~/.zshrc
 # Remove gitconfig
 rm ~/.gitconfig
 
+# Remove .ssh
+rm -r ~/.ssh
+
 # Uninstall vim
 rm ~/.vimrc
 #vim +PluginUpdate
