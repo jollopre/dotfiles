@@ -1,6 +1,6 @@
 # Options for zsh
 setopt auto_cd
-cdpath=(~/gitlab ~/github)
+cdpath=(~ ~/gitlab ~/github)
 
 # Environment variables
 export PATH="/opt/homebrew/bin:$PATH"
