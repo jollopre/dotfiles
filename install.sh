@@ -27,6 +27,7 @@ cp .gitconfig ~
 
 # Copy .ssh
 cp -R .ssh ~
+chmod 0600 ~/.ssh/id_rsa
 
 # Install vim
 cp .vimrc ~
