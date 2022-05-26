@@ -7,7 +7,6 @@ tap "homebrew/cask"
 
 cask "docker"
 cask "spotify"
-cask "macdown"
 
 brew "awscli"
 brew "aws-okta"

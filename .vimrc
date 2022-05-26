@@ -65,5 +65,6 @@ endtry
 " mappings
 nnoremap <c-p> :FZF<CR>
 nnoremap <c-f> :Ag<CR>
-nnoremap <c-n> :NERDTreeToggle<CR>
 nnoremap <c-b> :!git blame %:p<CR>
+nnoremap <c-l> :let @*=expand("%")<CR>
+nnoremap <c-n> :let @*=fnamemodify(expand("%"), ":~:.") . ":" . line(".")<CR>
