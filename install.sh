@@ -31,12 +31,15 @@ chmod 0600 ~/.ssh/id_rsa
 
 # Install vim
 cp .vimrc ~
+rm -rf ~/.vim/bundle/Vundle.vim
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 vim +PluginInstall +qall
 
 # Install ohmyzsh
+rm -rf ~/.oh-my-zsh
 git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
 
 # Install pass from my personal git repository
+rm -rf ~/github/pass
 git clone git@github.com:jollopre/pass.git ~/github/pass
 ln -s ~/github/pass ~/.password-store

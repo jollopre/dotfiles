@@ -50,6 +50,8 @@ call vundle#end()
 
 " Ale linter configuration. Requires eslint and ruby packages installed
 let g:ale_linters = { 'javascript': ['eslint'], 'ruby': ['ruby'] }
+" Highlights fenced code blocks within markdown files
+let g:markdown_fenced_languages = ['html', 'ruby', 'vim']
 
 " Ag
 if executable('ag')
