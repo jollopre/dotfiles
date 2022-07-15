@@ -6,6 +6,7 @@ tap "homebrew/bundle"
 tap "homebrew/cask"
 
 cask "docker"
+cask "postman"
 cask "spotify"
 
 brew "awscli"
