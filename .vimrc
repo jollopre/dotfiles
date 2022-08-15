@@ -12,7 +12,8 @@ set spell	" Enable spell-checking
 set visualbell	" Use visual bell (no beeping)
 
 set hlsearch	" Highlight all search results
-"set smartcase	" Enable smart-case search
+set ignorecase " Makes pattern matching case-insensitive
+set smartcase	" Overrides ignorecase if your pattern contains mixed case
 set incsearch	" Searches for strings incrementally
 
 set autoindent	" Auto-indent new lines
