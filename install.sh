@@ -31,6 +31,7 @@ chmod 0600 ~/.ssh/id_rsa
 
 # Install vim
 cp .vimrc ~
+cp -R skeletons ~
 rm -rf ~/.vim/bundle/Vundle.vim
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 vim +PluginInstall +qall

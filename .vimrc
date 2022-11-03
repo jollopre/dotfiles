@@ -71,3 +71,6 @@ nnoremap <c-f> :Ag<CR>
 nnoremap <c-b> :!git blame %:p<CR>
 nnoremap <c-l> :let @*=expand("%")<CR>
 nnoremap <c-n> :let @*=fnamemodify(expand("%"), ":~:.") . ":" . line(".")<CR>
+
+" autocmd
+autocmd BufNewFile *.sh 0r ~/skeletons/bash.sh " for new file event matching *.sh
