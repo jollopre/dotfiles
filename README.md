@@ -1,34 +1,36 @@
 # Dotfiles
 
-This repository contains my personal config files. This assumes a configuration for a MacOS.
+This repository contains my personal setup for MacOS machine.
 
 ## Quick Start
 
-Installation requires [git](https://git-scm.com/) and [gpg](https://gnupg.org/).
-
 1. Clone this repository:
+
 ```bash
 git clone git@github.com:jollopre/dotfiles.git ~/dotfiles
 ```
 
-2. Import public and private gpg keys from the backup in place:
-```
-# Decrypt the keys using the memorable passphrase
-gpg -o private.key -d private.key.gpg
-gpg -o public.key -d public.key.gpg
+2. Import public and private gpg keys from the backup store:
 
-# Import the keys into gpg
-gpg --allow-secret-key-import --import private.key
-gpg --import public.key
+```
+./installer gpg --import-secret-key=/a/path/to/private.key.gpg
+./installer gpg --import-public-key=/a/path/to/public.key.gpg
 
 # Check keys are properly imported
-gpg --list-secret-keys
-gpg --list-keys
+
+./installer gpg --list-secret-keys
+./installer gpg --list-public-keys
 ```
 
-3. Run install script
+3. Run installer
+
 ```bash
-sh ~/dotfiles/install.sh
+# Run brew bundle to install cask/brew programs
+./installer install
+# Copy decrypted secret files into ~
+./installer copy-secrets
+# Copy dotfiles
+./installer copy-dotfiles
 ```
 
 ## Encrypt data
@@ -55,19 +57,3 @@ In order to encrypt an updated file, you can modify the file as always but make 
 git-secret hide
 ```
 and remember, once you are done, please push changes back to this repository :).
-
-## Backup gpg keys
-
-1. Export keys from gpg:
-```bash
-gpg --export-secret-keys <key_id> > private.key
-gpg --export <key_id> > public.key
-```
-
-2. Encrypt them with a passphrase, remember to use something memorable:
-```bash
-gpg --symmetric --cipher-algo AES256 private.key
-gpg --symmetric --cipher-algo AES256 public.key
-```
-
-3. Store the encrypted keys into a safe place, remember the files ending with `.gpg` ONLY.
