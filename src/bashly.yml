@@ -17,6 +17,9 @@ commands:
   - long: --pass
     short: -p
     help: Install passwordstore
+  - long: --tmux
+    short: -t
+    help: Install tmux
   - long: --vim
     short: -v
     help: Install vim

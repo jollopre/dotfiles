@@ -96,6 +96,11 @@ installer_install_usage() {
     echo
 
     # :flag.usage
+    printf "  %s\n" "--tmux, -t"
+    printf "    Install tmux\n"
+    echo
+
+    # :flag.usage
     printf "  %s\n" "--vim, -v"
     printf "    Install vim\n"
     echo
@@ -292,6 +297,7 @@ installer_install_command() {
   ohmyzsh_flag=${args[--ohmyzsh]}
   pass_flag=${args[--pass]}
   vim_flag=${args[--vim]}
+  tmux_flag=${args[--tmux]}
 
   if [[ $homebrew_flag ]]; then
     echo "installing homebrew with --homebrew"
@@ -320,6 +326,15 @@ installer_install_command() {
       vim +PluginInstall +qall
     else
       echo "file .vimrc does not exist under ~, nothing will be installed"
+    fi
+  fi
+
+  if [[ $tmux_flag ]]; then
+    echo "installing tmux with --tmux"
+    if [[ -e ~/.tmux.conf ]]; then
+      git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+    else
+      echo "file .tmux.conf does not exist under ~, nothing will be installed"
     fi
   fi
 
@@ -578,6 +593,14 @@ installer_install_parse_requirements() {
 
         # :flag.case_no_arg
         args['--pass']=1
+        shift
+        ;;
+
+      # :flag.case
+      --tmux | -t)
+
+        # :flag.case_no_arg
+        args['--tmux']=1
         shift
         ;;
 

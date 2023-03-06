@@ -2,6 +2,7 @@ homebrew_flag=${args[--homebrew]}
 ohmyzsh_flag=${args[--ohmyzsh]}
 pass_flag=${args[--pass]}
 vim_flag=${args[--vim]}
+tmux_flag=${args[--tmux]}
 
 if [[ $homebrew_flag ]]; then
   echo "installing homebrew with --homebrew"
@@ -30,6 +31,15 @@ if [[ $vim_flag ]]; then
     vim +PluginInstall +qall
   else
     echo "file .vimrc does not exist under ~, nothing will be installed"
+  fi
+fi
+
+if [[ $tmux_flag ]]; then
+  echo "installing tmux with --tmux"
+  if [[ -e ~/.tmux.conf ]]; then
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+  else
+    echo "file .tmux.conf does not exist under ~, nothing will be installed"
   fi
 fi
 
