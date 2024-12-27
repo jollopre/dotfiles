@@ -37,6 +37,7 @@ fi
 if [[ $tmux_flag ]]; then
   echo "installing tmux with --tmux"
   if [[ -e ~/.tmux.conf ]]; then
+    rm -rf ~/.tmux/plugins/tpm
     git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
   else
     echo "file .tmux.conf does not exist under ~, nothing will be installed"
