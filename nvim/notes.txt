@@ -1,0 +1,2 @@
+BUNDLE_GEMFILE=.ruby-lsp/Gemfile bundle lock --add-platform aarch64-linux-musl
+BUNDLE_GEMFILE=.ruby-lsp/Gemfile bundle install
