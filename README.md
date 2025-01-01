@@ -10,32 +10,40 @@ This repository contains my personal setup for MacOS machine.
 git clone git@github.com:jollopre/dotfiles.git ~/dotfiles
 ```
 
-2. Import public and private gpg keys from the backup store:
-
-```
-./installer gpg --import-secret-key=/a/path/to/private.key.gpg
-./installer gpg --import-public-key=/a/path/to/public.key.gpg
-
-# Check keys are properly imported
-
-./installer gpg --list-secret-keys
-./installer gpg --list-public-keys
-```
-
-3. Run installer
+2. Run setup
 
 ```bash
-# Run brew bundle to install cask/brew programs
-./installer install
-# Copy decrypted secret files into ~
-./installer copy-secrets
-# Copy dotfiles
-./installer copy-dotfiles
+./bin/setup
 ```
+
+will display a menu with the following options:
+
+```
+Usage: bin/setup <command> [subcommand]
+Commands:
+  config-git            Configure git
+  install-ohmyzsh       Install OhMyZSH
+  install-homebrew      Install homebrew
+  install-neovim        Install neovim
+  install-tmux          Install tmux
+  gpg                   GPG
+    ├── list-public-keys      List public GPG keys
+    ├── list-secret-keys      List secret GPG keys
+    ├── import-public-key     Import public GPG key
+    ├── import-secret-key     Import secret GPG key
+  git-secret            git-secret
+    ├── add                   Add file for encrypting (TODO)
+    ├── update                Update file for encrypting (TODO)
+    ├── copy                  Copy secrets to "/Users/Jose.Lloret" (TODO, decouple .ssh from this flow)
+  install-pass          Install pass
+  help                  Display this help message
+```
+
+3. Follow the instructions on the screen to complete the setup.
 
 ## Encrypt data
 
-We use [git-secret](https://git-secret.io/) to store secrets that otherwise would be compromissed
+I use [git-secret](https://git-secret.io/) to store secrets that otherwise would be compromised
 within git versioning. Make sure that public/private [gpg](https://www.gnupg.org/) keys are stored in the machine beforehand.
 
 ### New file to be added
