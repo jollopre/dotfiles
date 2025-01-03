@@ -10,6 +10,10 @@ RUN apk --update add \
       build-base \
       ripgrep
 
+RUN gem install \
+      solargraph \
+      standardrb
+
 WORKDIR /usr/src/app
 
 CMD ["tail", "-f", "/dev/null"]
