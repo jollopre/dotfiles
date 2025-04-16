@@ -1,0 +1,208 @@
+#!/bin/bash
+
+config_git() {
+  echo "Configuring git"
+  rm -rf ~/.gitconfig
+  mkdir -p ~/gitlab
+  mkdir -p ~/github
+  cp .gitconfig ~
+}
+
+install_ohmyzsh() {
+  echo "Installing oh-my-zsh..."
+  rm -rf ~/.oh-my-zsh
+  git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh
+  cp .zshrc ~
+}
+
+install_homebrew() {
+  echo "Installing homebrew"
+  #/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  brew bundle
+}
+
+install_neovim() {
+  echo "Installing neovim..."
+  mkdir -p ~/.config
+  cp -R nvim ~/.config
+}
+
+install_tmux() {
+  echo "Installing tmux..."
+  cp .tmux.conf ~
+  rm -rf ~/.tmux/plugins/tpm
+  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+}
+
+
+gpg_list_public_keys() {
+  echo "Listing public GPG keys"
+  gpg --list-keys
+}
+
+gpg_list_secret_keys() {
+  echo "Listing secret GPG keys"
+  gpg --list-secret-keys
+}
+
+gpg_import_public_key() {
+  local file_path="$1"
+
+  if [ -z "$file_path" ]; then
+    echo "Usage: $0 gpg import-public-key /path/to/file"
+    exit 1
+  fi
+
+  if [ ! -f "$file_path" ]; then
+    echo "Error: File '$file_path' not found!"
+    exit 1
+  fi
+  echo "Decrypting public key from $file_path"
+  gpg -o public.key -d $file_path
+  echo "Importing public key..."
+  gpg --import public.key
+  echo "Deleting generated public.key file"
+  rm public.key
+}
+
+gpg_import_secret_key() {
+  local file_path="$1"
+
+  if [ -z "$file_path" ]; then
+    echo "Usage: $0 gpg import-secret-key /path/to/file"
+    exit 1
+  fi
+
+  if [ ! -f "$file_path" ]; then
+    echo "Error: File '$file_path' not found!"
+    exit 1
+  fi
+  echo "Decrypting private key from $file_path"
+  gpg -o private.key -d $file_path
+  echo "Importing private key..."
+  gpg --allow-secret-key-import --import private.key
+  echo "Deleting generated private.key file"
+  rm private.key
+}
+
+git_secret_add() {
+  echo "TODO"
+}
+
+git_secret_update() {
+  echot "TODO"
+}
+
+: '
+Requires: setup gpg import-public-key, setup gpg import-secret-key
+Description: Link decrypted files for working directory. Also configures ssh.
+'
+git_secret_copy() {
+  echo "Decrypt all hidden files"
+  git-secret reveal
+
+  echo "Copy flywire decrypted files into ~"
+  cp -R flywire ~
+  ln -s -f ~/flywire/.extended-routes ~
+  ln -s -f ~/flywire/.aws ~
+  ln -s -f ~/flywire/.tokens.sh ~
+
+  echo "Copy ssh decrypted files into ~"
+  cp -R .ssh ~
+  chmod 0600 ~/.ssh/id_rsa
+}
+
+: '
+Requires: openssh, pass, setup git-secret copy
+Description: Install pass and configures the password store to my private github repository of password.
+'
+install_pass() {
+  echo "Installing pass"
+  rm -rf ~/github/pass
+  mkdir -p ~/github/pass
+  git clone git@github.com:jollopre/pass.git ~/github/pass
+  ln -s -f ~/github/pass ~/.password-store
+}
+
+usage() {
+    echo "Usage: $0 <command> [subcommand]"
+    echo "Commands:"
+    echo "  config-git            Configure git"
+    echo "  install-ohmyzsh       Install OhMyZSH"
+    echo "  install-homebrew      Install homebrew"
+    echo "  install-neovim        Install neovim"
+    echo "  install-tmux          Install tmux"
+    echo "  gpg                   GPG"
+    echo "    ├── list-public-keys      List public GPG keys"
+    echo "    ├── list-secret-keys      List secret GPG keys"
+    echo "    ├── import-public-key     Import public GPG key"
+    echo "    ├── import-secret-key     Import secret GPG key"
+    echo "  git-secret            git-secret"
+    echo "    ├── add                   Add file for encrypting (TODO)"
+    echo "    ├── update                Update file for encrypting (TODO)"
+    echo "    ├── copy                  Copy secrets to \"$HOME\" (TODO, decouple .ssh from this flow)"
+    echo "  install-pass          Install pass"
+    echo "  help                  Display this help message"
+    exit 1
+}
+
+case "$1" in
+  config-git)
+    config_git
+    ;;
+  install-ohmyzsh)
+    install_ohmyzsh
+    ;;
+  install-homebrew)
+    install_homebrew
+    ;;
+  install-neovim)
+    install_neovim
+    ;;
+  install-tmux)
+    install_tmux
+    ;;
+  gpg)
+    case "$2" in
+      list-public-keys)
+        gpg_list_public_keys
+        ;;
+      list-secret-keys)
+        gpg_list_secret_keys
+        ;;
+      import-public-key)
+        gpg_import_public_key "$3"
+        ;;
+      import-secret-key)
+        gpg_import_secret_key "$3"
+        ;;
+      *)
+        echo "Invalid subcommand for gpg"
+        usage
+        ;;
+    esac
+    ;;
+  git-secret)
+    case "$2" in
+      add)
+        git_secret_add 
+        ;;
+      update)
+        git_secret_update
+        ;;
+      copy)
+        git_secret_copy
+        ;;
+      *)
+        echo "Invalid subcommand for git-secret"
+        usage
+        ;;
+    esac
+    ;;
+  install-pass)
+    install_pass
+    ;;
+  help|*)
+    usage
+    ;;
+esac
