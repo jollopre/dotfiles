@@ -23,7 +23,8 @@ install_homebrew() {
 
 install_neovim() {
   echo "Installing neovim..."
-  mkdir -p ~/.config
+  rm -rf ~/.config/nvim
+  mkdir -p ~/.config/nvim
   cp -R nvim ~/.config
 }
 

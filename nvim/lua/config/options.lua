@@ -24,7 +24,7 @@ vim.o.smartindent = true          -- Enable smart-indent
 vim.o.smarttab = true             -- Enable smart-tabs
 vim.o.softtabstop = 2             -- Number of spaces per Tab
 vim.o.encoding = 'utf-8'          -- Set encoding to UTF-8
-vim.o.foldmethod = 'syntax'       -- Allows folding a block by its syntax inferred
+vim.o.foldmethod = 'indent'       -- Allows folding a block by its indentation level
 vim.o.foldenable = false          -- Folding is disabled implicitly
 
 -- Advanced Settings
