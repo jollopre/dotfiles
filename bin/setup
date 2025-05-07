@@ -17,13 +17,14 @@ install_ohmyzsh() {
 
 install_homebrew() {
   echo "Installing homebrew"
-  #/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   brew bundle
 }
 
 install_neovim() {
   echo "Installing neovim..."
-  mkdir -p ~/.config
+  rm -rf ~/.config/nvim
+  mkdir -p ~/.config/nvim
   cp -R nvim ~/.config
 }
 
@@ -81,6 +82,8 @@ gpg_import_secret_key() {
   gpg -o private.key -d $file_path
   echo "Importing private key..."
   gpg --allow-secret-key-import --import private.key
+  echo "Trusting the Key, please type trust, choose 5 and save"
+  gpg --edit-key 3AE6F45129EAD69FEC607F7D4E29B67BD34C1F16
   echo "Deleting generated private.key file"
   rm private.key
 }
@@ -89,8 +92,14 @@ git_secret_add() {
   echo "TODO"
 }
 
+: '
+Requires: setup gpg import-public-key, setup gpg import-secret-key
+Description: Re-encrypt all files after updating. See git_secret_copy to understand the files that are
+             decrypted and copied to the home directory.
+'
 git_secret_update() {
-  echot "TODO"
+  echo "Re-encrypting all files after updating"
+  git-secret hide
 }
 
 : '
@@ -139,8 +148,8 @@ usage() {
     echo "    ├── import-secret-key     Import secret GPG key"
     echo "  git-secret            git-secret"
     echo "    ├── add                   Add file for encrypting (TODO)"
-    echo "    ├── update                Update file for encrypting (TODO)"
-    echo "    ├── copy                  Copy secrets to \"$HOME\" (TODO, decouple .ssh from this flow)"
+    echo "    ├── update                Update file for encrypting"
+    echo "    ├── copy                  Copy secrets to \"$HOME\""
     echo "  install-pass          Install pass"
     echo "  help                  Display this help message"
     exit 1
