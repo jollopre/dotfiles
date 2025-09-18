@@ -115,6 +115,7 @@ git_secret_copy() {
   ln -s -f ~/flywire/.extended-routes ~
   ln -s -f ~/flywire/.aws ~
   ln -s -f ~/flywire/.tokens.sh ~
+  ln -s -f ~/flywire/.aliases.sh ~
 
   echo "Copy ssh decrypted files into ~"
   cp -R .ssh ~

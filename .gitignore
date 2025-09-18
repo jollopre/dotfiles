@@ -6,3 +6,4 @@ flywire/.extended-routes
 flywire/.tokens.sh
 .ssh/id_rsa
 .ssh/id_rsa.pub
+flywire/.aliases.sh
