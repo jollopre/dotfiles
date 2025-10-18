@@ -3,6 +3,7 @@
 cask_args appdir: "/Applications"
 
 cask "spotify"
+cask "claude-code"
 
 brew "awscli"
 brew "curl"

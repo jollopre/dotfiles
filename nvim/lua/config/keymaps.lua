@@ -1,3 +1,8 @@
+vim.keymap.set("v", "<leader>y", '"+y', {
+  noremap = true,
+  silent = true,
+  desc = "Copy to system clipboard"
+})
 vim.keymap.set("n", "<leader>cp", "", {
   noremap = true,
   silent = true,
