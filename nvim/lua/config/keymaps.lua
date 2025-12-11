@@ -10,10 +10,6 @@ vim.keymap.set("n", "<leader>cp", "", {
     vim.fn.setreg('+', vim.fn.expand('%'))
   end
 })
-vim.keymap.set("n", "<leader>b", function()
-  local filepath = vim.fn.expand("%:p")
-  vim.cmd("!git blame " .. filepath)
-end, { noremap = true, silent = true })
 vim.keymap.set("n", "<leader>bn", "Next buffer", {
   noremap = true,
   silent = true,
