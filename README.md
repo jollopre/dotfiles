@@ -33,8 +33,9 @@ Commands:
     ├── import-secret-key     Import secret GPG key
   git-secret            git-secret
     ├── add                   Add file for encrypting (TODO)
-    ├── update                Update file for encrypting (TODO)
-    ├── copy                  Copy secrets to "/Users/Jose.Lloret" (TODO, decouple .ssh from this flow)
+    ├── reveal                Decrypt files for editing
+    ├── update                Re-encrypt files and cleanup decrypted versions
+    ├── copy                  Decrypt and setup secrets in "$HOME"
   install-pass          Install pass
   help                  Display this help message
 ```
@@ -59,9 +60,18 @@ git-secret hide
 
 ### Update existing file
 
-In order to encrypt an updated file, you can modify the file as always but make sure to type:
+To edit encrypted files, use the reveal-edit-update workflow:
 
 ```bash
-git-secret hide
+# 1. Decrypt files for editing
+./bin/setup git-secret reveal
+
+# 2. Edit your files
+vim flywire/.tokens.sh
+# ... make your changes
+
+# 3. Re-encrypt and cleanup
+./bin/setup git-secret update
 ```
-and remember, once you are done, please push changes back to this repository :).
+
+Remember to push your changes back to this repository after updating.
