@@ -66,6 +66,18 @@ gpg_import_public_key() {
   rm public.key
 }
 
+# Centralized configuration for git-secret managed files
+# Format: "source_path:destination_path:is_symlink"
+# is_symlink: true = create symbolic link, false = copy file
+declare -a GIT_SECRET_FILES=(
+  "flywire/.aws:~/.aws:true"
+  "flywire/.extended-routes:~/.extended-routes:true"
+  "flywire/.tokens.sh:~/.tokens.sh:true"
+  "flywire/.aliases.sh:~/.aliases.sh:true"
+  ".ssh/id_rsa:~/.ssh/id_rsa:false"
+  ".ssh/id_rsa.pub:~/.ssh/id_rsa.pub:false"
+)
+
 gpg_import_secret_key() {
   local file_path="$1"
 
@@ -94,12 +106,44 @@ git_secret_add() {
 
 : '
 Requires: setup gpg import-public-key, setup gpg import-secret-key
-Description: Re-encrypt all files after updating. See git_secret_copy to understand the files that are
-             decrypted and copied to the home directory.
+Description: Reveal encrypted files for editing.
+'
+git_secret_reveal() {
+  echo "Revealing all encrypted files for editing"
+  git-secret reveal -f
+
+  echo "Files decrypted and ready for editing:"
+  for entry in "${GIT_SECRET_FILES[@]}"; do
+    IFS=':' read -r source_path dest_path is_symlink <<< "$entry"
+
+    if [ -f "$source_path" ]; then
+      echo "  ✓ $source_path"
+    fi
+  done
+
+  echo ""
+  echo "After editing, run: setup git-secret update"
+}
+
+: '
+Requires: setup gpg import-public-key, setup gpg import-secret-key
+Description: Re-encrypt all files after updating and clean up decrypted files.
 '
 git_secret_update() {
   echo "Re-encrypting all files after updating"
   git-secret hide
+
+  echo "Cleaning up decrypted files to leave no traces"
+  for entry in "${GIT_SECRET_FILES[@]}"; do
+    IFS=':' read -r source_path dest_path is_symlink <<< "$entry"
+
+    if [ -f "$source_path" ]; then
+      echo "  Removing decrypted file: $source_path"
+      rm -f "$source_path"
+    fi
+  done
+
+  echo "Cleanup complete - no unencrypted files remaining"
 }
 
 : '
@@ -110,16 +154,33 @@ git_secret_copy() {
   echo "Decrypt all hidden files"
   git-secret reveal
 
-  echo "Copy flywire decrypted files into ~"
-  cp -R flywire ~
-  ln -s -f ~/flywire/.extended-routes ~
-  ln -s -f ~/flywire/.aws ~
-  ln -s -f ~/flywire/.tokens.sh ~
-  ln -s -f ~/flywire/.aliases.sh ~
+  echo "Setting up decrypted files using centralized configuration"
+  for entry in "${GIT_SECRET_FILES[@]}"; do
+    IFS=':' read -r source_path dest_path is_symlink <<< "$entry"
 
-  echo "Copy ssh decrypted files into ~"
-  cp -R .ssh ~
-  chmod 0600 ~/.ssh/id_rsa
+    # Expand tilde in destination path
+    dest_path="${dest_path/#\~/$HOME}"
+
+    # Create parent directory if it doesn't exist
+    dest_dir=$(dirname "$dest_path")
+    mkdir -p "$dest_dir"
+
+    if [ "$is_symlink" = "true" ]; then
+      echo "  Creating symlink: $dest_path -> $(pwd)/$source_path"
+      ln -s -f "$(pwd)/$source_path" "$dest_path"
+    else
+      echo "  Copying file: $source_path -> $dest_path"
+      cp "$source_path" "$dest_path"
+
+      # Special handling for SSH private keys
+      if [[ "$dest_path" == *"/.ssh/id_rsa" ]]; then
+        chmod 0600 "$dest_path"
+        echo "    Set permissions 0600 on $dest_path"
+      fi
+    fi
+  done
+
+  echo "Decrypted files setup complete"
 }
 
 : '
@@ -149,8 +210,9 @@ usage() {
     echo "    ├── import-secret-key     Import secret GPG key"
     echo "  git-secret            git-secret"
     echo "    ├── add                   Add file for encrypting (TODO)"
-    echo "    ├── update                Update file for encrypting"
-    echo "    ├── copy                  Copy secrets to \"$HOME\""
+    echo "    ├── reveal                Decrypt files for editing"
+    echo "    ├── update                Re-encrypt files and cleanup decrypted versions"
+    echo "    ├── copy                  Decrypt and setup secrets in \"$HOME\""
     echo "  install-pass          Install pass"
     echo "  help                  Display this help message"
     exit 1
@@ -195,7 +257,10 @@ case "$1" in
   git-secret)
     case "$2" in
       add)
-        git_secret_add 
+        git_secret_add
+        ;;
+      reveal)
+        git_secret_reveal
         ;;
       update)
         git_secret_update
