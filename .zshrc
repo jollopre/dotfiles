@@ -2,11 +2,11 @@
 setopt auto_cd
 cdpath=(~ ~/gitlab ~/github)
 
-# Environment variables
-HOMEBREW_PATH=/opt/homebrew/bin
-RUBY_PATH=/opt/homebrew/opt/ruby/bin
-RUBY_GEMS_PATH=/opt/homebrew/lib/ruby/gems/$($RUBY_PATH/ruby -e 'puts RbConfig::CONFIG["ruby_version"]')/bin
-export PATH="$RUBY_GEMS_PATH:$HOMEBREW_PATH:$RUBY_PATH:$PATH"
+export RUBY_PATH="/opt/homebrew/opt/ruby/bin"
+export PATH="$RUBY_PATH:$PATH"
+export RUBY_GEMS_PATH="$($RUBY_PATH/ruby -e 'print Gem.bindir')"
+export PATH="$RUBY_GEMS_PATH:$PATH"
+
 source ~/.tokens.sh
 source ~/.aliases.sh
 
