@@ -62,7 +62,7 @@ cmd_edit() {
 
   jq -r --arg s "$slug" 'select(.slug == $s) | .content' "$NOTES_FILE" > "$tmp"
 
-  ${EDITOR:-vi} "$tmp"
+  ${EDITOR:-$(command -v nvim || echo vi)} "$tmp"
 
   local new_content tmp_jsonl
   new_content=$(cat "$tmp")
