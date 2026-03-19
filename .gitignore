@@ -7,3 +7,4 @@ flywire/.tokens.sh
 .ssh/id_rsa
 .ssh/id_rsa.pub
 flywire/.aliases.sh
+notes/var/db/notes.jsonl
