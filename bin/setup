@@ -187,33 +187,37 @@ git_secret_copy() {
 Requires: openssh, pass, setup git-secret copy
 Description: Install pass and configures the password store to my private github repository of password.
 '
-install_notes() {
-  echo "Installing notes..."
-
-  local notes_bin notes_db
-  notes_bin="$(pwd)/notes/bin/notes"
-  notes_db="$(pwd)/notes/var/db"
-
-  chmod +x "$notes_bin"
-
-  mkdir -p ~/.local/bin
-  ln -s -f "$notes_bin" ~/.local/bin/notes
-
-  mkdir -p "$notes_db"
-  if [ ! -f "$notes_db/notes.jsonl" ]; then
-    touch "$notes_db/notes.jsonl"
-  fi
-
-  echo "notes installed -> ~/.local/bin/notes"
-  echo "Data store: $notes_db/notes.jsonl"
-}
-
 install_pass() {
   echo "Installing pass"
   rm -rf ~/github/pass
   mkdir -p ~/github/pass
   git clone git@github.com:jollopre/pass.git ~/github/pass
   ln -s -f ~/github/pass ~/.password-store
+}
+
+install_skills() {
+  echo "Installing personal Claude skills..."
+
+  local skills_src skills_dest
+  skills_src="$(pwd)/skills"
+  skills_dest="$HOME/.claude/skills"
+
+  if [ ! -d "$skills_src" ]; then
+    echo "Error: skills directory not found at $skills_src"
+    exit 1
+  fi
+
+  mkdir -p "$skills_dest"
+
+  for skill_dir in "$skills_src"/*/; do
+    [ -d "$skill_dir" ] || continue
+    local skill_name
+    skill_name="$(basename "$skill_dir")"
+    echo "  Linking skill: $skills_dest/$skill_name -> $skill_dir"
+    ln -s -f "${skill_dir%/}" "$skills_dest/$skill_name"
+  done
+
+  echo "Skills installed -> $skills_dest"
 }
 
 usage() {
@@ -234,8 +238,8 @@ usage() {
     echo "    ├── reveal                Decrypt files for editing"
     echo "    ├── update                Re-encrypt files and cleanup decrypted versions"
     echo "    ├── copy                  Decrypt and setup secrets in \"$HOME\""
-    echo "  install-notes         Install notes"
     echo "  install-pass          Install pass"
+    echo "  install-skills        Symlink personal Claude skills into ~/.claude/skills"
     echo "  help                  Display this help message"
     exit 1
 }
@@ -296,11 +300,11 @@ case "$1" in
         ;;
     esac
     ;;
-  install-notes)
-    install_notes
-    ;;
   install-pass)
     install_pass
+    ;;
+  install-skills)
+    install_skills
     ;;
   help|*)
     usage
