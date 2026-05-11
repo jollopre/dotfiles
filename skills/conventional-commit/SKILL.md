@@ -15,6 +15,10 @@ The commit message should follow this format:
 [optional body]
 
 flags: [SKIP_MANUAL]
+
+Generated with AI
+
+Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 Where `<type>` is one of the following:
