@@ -1,6 +1,12 @@
 ---
 name: open-mr
 description: Push current branch to GitLab creating a merge request (derived from the commit title), then log it under the MRs section of today's Obsidian Daily Note. Use when the user says "open MR", "push and track", "create MR", "open merge request", "ship MR", or "push MR".
+allowed-tools:
+  - Bash(git *)
+  - Bash(obsidian *)
+  - Bash(ls *)
+  - Read
+  - Edit
 ---
 
 # Open MR

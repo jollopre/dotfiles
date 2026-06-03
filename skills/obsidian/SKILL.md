@@ -1,6 +1,11 @@
 ---
 name: obsidian
 description: Read, create, and update notes in the user's Obsidian vault. Use whenever the user asks to update notes, add to their vault, log an incident, track an MR, add a reference, create a calendar entry, or mentions "obsidian", "vault", "notes". Also trigger on "note this down", "add to my notes", "update my tracker", "log this incident", "save this to my vault".
+allowed-tools:
+  - Bash(obsidian *)
+  - Bash(ls *)
+  - Read
+  - Edit
 ---
 
 # Obsidian Vault
@@ -41,6 +46,33 @@ Do not use `obsidian write` — it does not exist. Use `Edit` for targeted chang
 
 If the requested section doesn't exist in today's note, **ask the user** before creating it — the daily-note template may intentionally omit it.
 
+## Implementation Plan
+
+When the user asks to create an Implementation Plan note:
+
+1. **Ask the user for the file name** — this is required, never invent it.
+2. **Defaults** (use unless the user overrides):
+   - `path` → `Efforts/Work`
+   - `template` → `Implementation Plan`
+3. Both `path` and `template` can be overridden if the user specifies a different value.
+4. Before defaulting `path`, `ls <VAULT_PATH>/<default-path>/` to confirm sibling Implementation Plans live there. If the user files them elsewhere, follow that convention or ask.
+5. Run: `obsidian create name="<name>" path="<path>" template="<template>"`
+
+**Locate the real file (required workflow):**
+
+Never trust the `Created: …` line printed by `obsidian create` — Templater may rename the file on creation (e.g. prefixing the template name), making that path stale. Always use this sequence:
+
+1. `obsidian vault` — get the absolute vault path.
+2. `ls <VAULT_PATH>/<path>/ | grep <name>` — find the real filename.
+3. `Read` the file directly using its full on-disk path.
+
+**Write into the note (required workflow):**
+
+1. `Read` the file first to discover the template's section headings and per-task field schema.
+2. Preserve those exact headings (including any emoji), field labels, and bullet style when adding content.
+3. Use `Edit` for targeted insertions; do not rewrite unrelated sections.
+4. If a section the user wants doesn't exist in the template, **ask before adding it** — the template may intentionally omit it.
+
 ## Behavior Rules
 
 1. **Read before editing** — understand the file's structure first
@@ -48,3 +80,4 @@ If the requested section doesn't exist in today's note, **ask the user** before 
 3. **Append, don't rewrite** — add to the appropriate section, don't restructure unrelated content
 4. **Ask when ambiguous** — if folder or note type is unclear, ask before creating
 5. **Check before creating** — prefer updating existing notes over creating duplicates
+6. **Never touch `.md.secret` files** — these are git-secret encrypted files managed entirely outside Claude's scope. Do not read, edit, rename, move, or delete them under any circumstances.
