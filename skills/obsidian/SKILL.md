@@ -73,6 +73,18 @@ Never trust the `Created: …` line printed by `obsidian create` — Templater m
 3. Use `Edit` for targeted insertions; do not rewrite unrelated sections.
 4. If a section the user wants doesn't exist in the template, **ask before adding it** — the template may intentionally omit it.
 
+## Archive Calendar Notes
+
+When the user asks to archive daily notes "up to this week" (or similar — "archive everything before this week"):
+
+1. `obsidian vault` — get the absolute vault path.
+2. `ls <VAULT_PATH>/Calendar/` — list all daily notes (both `.md` and `.md.secret`) plus the existing `Archive/` subfolder.
+3. Compute the current week's Monday using ISO 8601 (weeks start **Monday**, end **Sunday**) — never assume Sunday-start. If the user's vault convention differs, ask.
+4. Any daily note dated **before** that Monday is in scope. Notes dated Monday–Sunday of the current week are **not** touched, even if today is early in the week (e.g. a Tuesday leaves Monday's note alone, but the prior Sunday's note is in scope for archiving).
+5. Move each in-scope file with `mv` into `Calendar/Archive/`, preserving the filename exactly.
+6. **Move `.md`/`.md.secret` pairs together** — this is a plain filesystem move (not a read/edit/delete of secret content), and matches the existing pattern already present in `Archive/` (every archived date has both files side by side). This does not violate the "never touch `.md.secret`" rule below, which is about reading/editing/deleting content, not relocating the pair as a unit.
+7. Double-check the boundary date explicitly (the day before this week's Monday) — it's easy to accidentally leave it behind since it doesn't look like part of "this week" at a glance. Verify with a final `ls` on both `Calendar/` and `Calendar/Archive/` after moving.
+
 ## Behavior Rules
 
 1. **Read before editing** — understand the file's structure first
