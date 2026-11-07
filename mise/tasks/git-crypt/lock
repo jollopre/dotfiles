@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Re-encrypt git-crypt files in the dotfiles working tree (needs a clean tree)"
+#MISE dir="{{env.HOME}}/dotfiles"
+set -euo pipefail
+
+git-crypt lock

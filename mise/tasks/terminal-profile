@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+#MISE description="Install the Dracula Terminal.app profile and make it the default"
+#USAGE flag "-f --force" help="Re-import even if Dracula is already the default"
+# Requires: macOS Terminal.app, curl, shasum
+# Source: github.com/dracula/terminal-app, pinned commit, checksum verified
+set -euo pipefail
+
+PROFILE="Dracula"
+COMMIT="069b19d05b35aafcae1ae182df10cfd6e85ffb30"
+SHA256="882da24e7fbd634ac6b8ff6ae8e45d6b9d566e59ff108adc86ed1af626fe0a1d"
+URL="https://raw.githubusercontent.com/dracula/terminal-app/$COMMIT/$PROFILE.terminal"
+
+# Runs on every `mise bootstrap`: skip when already configured
+current=$(osascript -e 'tell application "Terminal" to get name of default settings' 2>/dev/null || true)
+if [ "$current" = "$PROFILE" ] && [ "${usage_force:-false}" != "true" ]; then
+  echo "$PROFILE is already the default Terminal.app profile"
+  exit 0
+fi
+
+echo "Installing $PROFILE Terminal.app profile..."
+tmp_dir=$(mktemp -d)
+trap 'rm -rf "$tmp_dir"' EXIT
+
+curl -fsSL -o "$tmp_dir/$PROFILE.terminal" "$URL"
+
+echo "Verifying checksum..."
+echo "$SHA256  $tmp_dir/$PROFILE.terminal" | shasum -a 256 -c -
+
+open -a Terminal "$tmp_dir/$PROFILE.terminal"
+
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  osascript -e "tell application \"Terminal\" to get name of settings set \"$PROFILE\"" >/dev/null 2>&1 && break
+  sleep 1
+done
+
+osascript <<EOS
+tell application "Terminal"
+  set font size of settings set "$PROFILE" to 14
+  set default settings to settings set "$PROFILE"
+  set startup settings to settings set "$PROFILE"
+end tell
+EOS
+echo "$PROFILE is now the default Terminal.app profile"

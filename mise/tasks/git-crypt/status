@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="List files encrypted by git-crypt"
+#MISE dir="{{env.HOME}}/dotfiles"
+set -euo pipefail
+
+git-crypt status -e

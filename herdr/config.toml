@@ -11,7 +11,7 @@ tab_bar_right = [
   { type = "zoom" },
   { type = "hostname" },
   { type = "datetime", format = "%Y-%m-%d %H:%M" },
-  { type = "command", command = "git branch --show-current", interval_seconds = 30, timeout_seconds = 5 },
+  { type = "command", command = "git branch --show-current 2>/dev/null || true", interval_seconds = 30, timeout_seconds = 5 },
 ]
 tab_bar_right_separator = " · "
 

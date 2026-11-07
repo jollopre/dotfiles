@@ -1,6 +1,48 @@
+# Global mise config. ~/.config/mise is a symlink to this directory, so this
+# file also drives `mise bootstrap` (machine setup) and `mise dot apply`.
+# Secrets live in config.secrets.toml and load with `mise -E secrets ...`.
+
 [tools]
-ruby = "3.4.10"
+ruby = "3.4.12"
+# Release checksum and GitHub artifact attestation are verified on install
+"github:sbldevnet/cloudflared-proxy" = "1.0.1"
 
 [settings]
 # Honour per-project .ruby-version files
 idiomatic_version_file_enable_tools = ["ruby"]
+# Where `mise dot add` stores new sources
+dotfiles.root = "~/dotfiles"
+
+# Homebrew (and mise itself) must already be installed; the Brewfile stays the
+# source of truth for formulae and casks. Runs first so git-crypt, gnupg and the
+# libraries Ruby links against exist before later phases.
+[bootstrap.hooks.pre-packages]
+description = "Install Homebrew formulae and casks from the Brewfile"
+run = "brew bundle check --file ~/dotfiles/Brewfile >/dev/null || brew bundle --file ~/dotfiles/Brewfile"
+
+[bootstrap.repos]
+"~/.oh-my-zsh" = { url = "https://github.com/ohmyzsh/ohmyzsh.git" }
+
+# Sources are absolute: relative ones resolve through the ~/.config/mise symlink
+[dotfiles]
+"~/.zshrc" = { source = "~/dotfiles/.zshrc" }
+"~/.gitconfig" = { source = "~/dotfiles/.gitconfig" }
+"~/.config/nvim" = { source = "~/dotfiles/nvim" }
+"~/.config/tuicr/config.toml" = { source = "~/dotfiles/tuicr/config.toml" }
+"~/.config/herdr/config.toml" = { source = "~/dotfiles/herdr/config.toml" }
+# One entry per skill: symlink-each would link every file inside, not the folder
+"~/.claude/skills/address-mr-comments" = { source = "~/dotfiles/skills/address-mr-comments" }
+"~/.claude/skills/clean-rspec-output" = { source = "~/dotfiles/skills/clean-rspec-output" }
+"~/.claude/skills/conventional-commit" = { source = "~/dotfiles/skills/conventional-commit" }
+"~/.claude/skills/interview-review" = { source = "~/dotfiles/skills/interview-review" }
+"~/.claude/skills/obsidian" = { source = "~/dotfiles/skills/obsidian" }
+"~/.claude/skills/open-mr" = { source = "~/dotfiles/skills/open-mr" }
+"~/.claude/skills/summarise" = { source = "~/dotfiles/skills/summarise" }
+
+# Runs on every `mise bootstrap`, so each step must be safe to repeat
+[tasks.bootstrap]
+description = "Create workspace folders and set the Terminal.app profile"
+run = [
+  "mkdir -p ~/gitlab ~/github",
+  "mise run terminal-profile",
+]

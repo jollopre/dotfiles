@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Decrypt and import a GPG public key"
+#USAGE arg "<file>" help="Encrypted public key file"
+set -euo pipefail
+
+[ -f "$usage_file" ] || { echo "Error: file '$usage_file' not found" >&2; exit 1; }
+
+# Pipe straight into the keyring: no decrypted key is written to disk
+gpg --decrypt "$usage_file" | gpg --import

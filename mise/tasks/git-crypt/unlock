@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#MISE description="Decrypt git-crypt files in the dotfiles working tree (no-op if unlocked)"
+#MISE dir="{{env.HOME}}/dotfiles"
+set -euo pipefail
+
+if [ -d "$(git rev-parse --git-dir)/git-crypt/keys" ]; then
+  echo "Repository already unlocked"
+  exit 0
+fi
+echo "Unlocking git-crypt files with your GPG key"
+git-crypt unlock
