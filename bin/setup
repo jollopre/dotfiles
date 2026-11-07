@@ -40,6 +40,13 @@ install_herdr() {
   cp herdr/config.toml ~/.config/herdr/config.toml
 }
 
+install_mise() {
+  echo "Installing mise config..."
+  mkdir -p ~/.config/mise
+  cp mise/config.toml ~/.config/mise/config.toml
+  mise install
+}
+
 DRACULA_TERMINAL_COMMIT="069b19d05b35aafcae1ae182df10cfd6e85ffb30"
 DRACULA_TERMINAL_SHA256="882da24e7fbd634ac6b8ff6ae8e45d6b9d566e59ff108adc86ed1af626fe0a1d"
 
@@ -313,6 +320,7 @@ usage() {
     echo "  install-neovim        Install neovim"
     echo "  install-tuicr         Install tuicr config"
     echo "  install-herdr         Install herdr config"
+    echo "  install-mise          Install mise config and tools (Ruby)"
     echo "  install-terminal-profile  Install Dracula Terminal.app profile as default"
     echo "  install-glab          Install glab config"
     echo "  install-cloudflared-proxy [vX.Y.Z]  Install cloudflared-proxy (latest by default)"
@@ -350,6 +358,9 @@ case "$1" in
     ;;
   install-herdr)
     install_herdr
+    ;;
+  install-mise)
+    install_mise
     ;;
   install-terminal-profile)
     install_terminal_profile

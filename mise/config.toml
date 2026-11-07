@@ -1,0 +1,6 @@
+[tools]
+ruby = "3.4.10"
+
+[settings]
+# Honour per-project .ruby-version files
+idiomatic_version_file_enable_tools = ["ruby"]

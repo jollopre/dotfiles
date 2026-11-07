@@ -2,9 +2,7 @@
 setopt auto_cd
 cdpath=(~ ~/gitlab ~/github)
 
-export RUBY_PATH="/opt/homebrew/opt/ruby@3.4/bin"
-export RUBY_GEMS_PATH="$($RUBY_PATH/ruby -e 'print Gem.bindir')"
-export PATH="$HOME/.local/bin:$RUBY_GEMS_PATH:$RUBY_PATH:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
 # Rancher Desktop CLI tools (docker, kubectl, nerdctl...) when installed
 [[ -d "$HOME/.rd/bin" ]] && export PATH="$HOME/.rd/bin:$PATH"
