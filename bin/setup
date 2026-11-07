@@ -40,6 +40,46 @@ install_herdr() {
   cp herdr/config.toml ~/.config/herdr/config.toml
 }
 
+DRACULA_TERMINAL_COMMIT="069b19d05b35aafcae1ae182df10cfd6e85ffb30"
+DRACULA_TERMINAL_SHA256="882da24e7fbd634ac6b8ff6ae8e45d6b9d566e59ff108adc86ed1af626fe0a1d"
+
+: '
+Requires: macOS Terminal.app, curl, shasum
+Description: Download the Dracula profile (github.com/dracula/terminal-app, pinned commit),
+verify its checksum, import it into Terminal.app and make it the default.
+'
+install_terminal_profile() {
+  local profile="Dracula"
+  local url="https://raw.githubusercontent.com/dracula/terminal-app/$DRACULA_TERMINAL_COMMIT/$profile.terminal"
+
+  echo "Installing $profile Terminal.app profile..."
+  local tmp_dir
+  tmp_dir=$(mktemp -d)
+  trap 'rm -rf "$tmp_dir"' RETURN
+
+  curl -fsSL -o "$tmp_dir/$profile.terminal" "$url" || { echo "Error: download failed"; exit 1; }
+
+  echo "Verifying checksum..."
+  echo "$DRACULA_TERMINAL_SHA256  $tmp_dir/$profile.terminal" | shasum -a 256 -c - || { echo "Error: checksum mismatch"; exit 1; }
+
+  open -a Terminal "$tmp_dir/$profile.terminal"
+
+  local attempt
+  for attempt in 1 2 3 4 5 6 7 8 9 10; do
+    osascript -e "tell application \"Terminal\" to get name of settings set \"$profile\"" >/dev/null 2>&1 && break
+    sleep 1
+  done
+
+  osascript <<EOS || { echo "Error: could not configure the $profile profile"; exit 1; }
+tell application "Terminal"
+  set font size of settings set "$profile" to 14
+  set default settings to settings set "$profile"
+  set startup settings to settings set "$profile"
+end tell
+EOS
+  echo "$profile is now the default Terminal.app profile"
+}
+
 install_glab() {
   echo "Installing glab config..."
   mkdir -p ~/Library/Application\ Support/glab-cli
@@ -273,6 +313,7 @@ usage() {
     echo "  install-neovim        Install neovim"
     echo "  install-tuicr         Install tuicr config"
     echo "  install-herdr         Install herdr config"
+    echo "  install-terminal-profile  Install Dracula Terminal.app profile as default"
     echo "  install-glab          Install glab config"
     echo "  install-cloudflared-proxy [vX.Y.Z]  Install cloudflared-proxy (latest by default)"
     echo "  gpg                   GPG"
@@ -309,6 +350,9 @@ case "$1" in
     ;;
   install-herdr)
     install_herdr
+    ;;
+  install-terminal-profile)
+    install_terminal_profile
     ;;
   install-glab)
     install_glab
