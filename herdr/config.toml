@@ -1,0 +1,24 @@
+onboarding = false
+
+[theme]
+name = "dracula"
+auto_switch = false
+
+[ui]
+sidebar_collapsed_mode = "hidden"
+sidebar_start_collapsed = true
+tab_bar_right = [
+  { type = "zoom" },
+  { type = "hostname" },
+  { type = "datetime", format = "%Y-%m-%d %H:%M" },
+  { type = "command", command = "git branch --show-current", interval_seconds = 30, timeout_seconds = 5 },
+]
+tab_bar_right_separator = " · "
+
+[ui.toast]
+delivery = "terminal"
+
+[keys]
+new_worktree = ""
+open_worktree = "prefix+shift+o"
+remove_worktree = ""

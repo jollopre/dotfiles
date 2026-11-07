@@ -14,7 +14,7 @@ allowed-tools:
 
 Always discover the vault path dynamically — never hardcode it.
 
-- Run `obsidian vault` to get the absolute path to the user's vault.
+- Run `obsidian vault` and use its `path` field as the absolute path to the user's vault. The command prints `name`/`path`/`files`/... lines, not just a bare path.
 - Use this path as the base for any `Read`/`Edit`/`Write` operations on vault files.
 
 ## Daily Note
@@ -33,6 +33,19 @@ Never rely on `obsidian daily:path` as the authoritative path — Templater's `t
 1. If `ls` returns no match, run `obsidian daily` to trigger creation.
 2. Re-run `ls` to get the actual filename after Templater renames it.
 3. **Ask the user** which template to use if it's not obvious from prior daily notes — don't invent structure.
+4. Carry over unchecked items (see below).
+
+**Carry over unchecked items (on creation only):**
+
+Run this only right after creating today's note, not every time it's opened. It applies to two sections: `## 🎯 Focus` and `## 🚀 MRs`.
+
+1. Find the most recent daily note dated **before** today: `ls <VAULT_PATH>/Calendar/ <VAULT_PATH>/Calendar/Archive/` and pick the latest `YYYY-MM-DD - Daily.md`. Check `Archive/` too, since the previous note may already be archived (e.g. on a Monday).
+2. `Read` that note. For each section, take everything from its heading up to the next `##` heading.
+3. Collect every unchecked item (`- [ ]`) in its original order, together with any indented child lines under it. Skip checked items (`- [x]`), the italic description line, and the MRs template placeholder (`- [ ] Commit Subject Line | [MR !id](link) | [[Obsidian File]]`).
+4. Leave out items that are already in the same section of today's note, so running this twice doesn't add duplicates. For MRs, treat two entries with the same `MR !id` as the same item.
+5. `Edit` today's note to insert the items under the matching heading, after the italic description line, keeping their text exactly as it was. In MRs, if the section has only the placeholder line, replace the placeholder with the carried items instead of adding them below it (same rule as the `open-mr` skill).
+6. Don't change the previous note. Its unchecked items stay as they are.
+7. Handle each section on its own: if one has nothing unchecked, or the previous note doesn't have it, skip that section and say so briefly.
 
 **Append under a specific section (required workflow):**
 
@@ -78,12 +91,11 @@ Never trust the `Created: …` line printed by `obsidian create` — Templater m
 When the user asks to archive daily notes "up to this week" (or similar — "archive everything before this week"):
 
 1. `obsidian vault` — get the absolute vault path.
-2. `ls <VAULT_PATH>/Calendar/` — list all daily notes (both `.md` and `.md.secret`) plus the existing `Archive/` subfolder.
+2. `ls <VAULT_PATH>/Calendar/` — list all daily notes plus the existing `Archive/` subfolder.
 3. Compute the current week's Monday using ISO 8601 (weeks start **Monday**, end **Sunday**) — never assume Sunday-start. If the user's vault convention differs, ask.
 4. Any daily note dated **before** that Monday is in scope. Notes dated Monday–Sunday of the current week are **not** touched, even if today is early in the week (e.g. a Tuesday leaves Monday's note alone, but the prior Sunday's note is in scope for archiving).
 5. Move each in-scope file with `mv` into `Calendar/Archive/`, preserving the filename exactly.
-6. **Move `.md`/`.md.secret` pairs together** — this is a plain filesystem move (not a read/edit/delete of secret content), and matches the existing pattern already present in `Archive/` (every archived date has both files side by side). This does not violate the "never touch `.md.secret`" rule below, which is about reading/editing/deleting content, not relocating the pair as a unit.
-7. Double-check the boundary date explicitly (the day before this week's Monday) — it's easy to accidentally leave it behind since it doesn't look like part of "this week" at a glance. Verify with a final `ls` on both `Calendar/` and `Calendar/Archive/` after moving.
+6. Double-check the boundary date explicitly (the day before this week's Monday) — it's easy to accidentally leave it behind since it doesn't look like part of "this week" at a glance. Verify with a final `ls` on both `Calendar/` and `Calendar/Archive/` after moving.
 
 ## Behavior Rules
 
@@ -92,4 +104,3 @@ When the user asks to archive daily notes "up to this week" (or similar — "arc
 3. **Append, don't rewrite** — add to the appropriate section, don't restructure unrelated content
 4. **Ask when ambiguous** — if folder or note type is unclear, ask before creating
 5. **Check before creating** — prefer updating existing notes over creating duplicates
-6. **Never touch `.md.secret` files** — these are git-secret encrypted files managed entirely outside Claude's scope. Do not read, edit, rename, move, or delete them under any circumstances.

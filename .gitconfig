@@ -4,4 +4,4 @@
 [init]
   defaultBranch = main
 [includeIf "gitdir:~/gitlab/"]
-  path = ~/flywire/.gitconfig
+  path = ~/.gitconfig-work

@@ -54,8 +54,26 @@ Extract from git state:
 - **branch**: current branch name (`git branch --show-current`)
 - **title**: first line of the latest commit (`git log -1 --format='%s' HEAD`)
 - **assignee**: user's email from memory or git config (`git config user.email`)
+- **target**: the branch this one was cut from (see below)
 
-Ask the user which **label** to apply to the MR. Always ask — do not assume a default.
+#### Detect the target branch
+
+When the branch was cut from another unmerged branch, open a stacked MR against that branch so the diff shows only this branch's commits. Detect it automatically:
+
+```bash
+git fetch -q origin
+git for-each-ref --format='%(refname:short)' refs/remotes/origin \
+  --merged HEAD --no-merged origin/master \
+  | grep -vx -e origin/HEAD -e "origin/<BRANCH>"
+```
+
+This lists remote branches whose tip is in this branch's history but not yet merged to master.
+
+- **No candidates** → target is `master`.
+- **One candidate** → target is that branch (strip the `origin/` prefix).
+- **Several candidates** → pick the closest one, the one with the fewest commits up to `HEAD` (`git rev-list --count origin/<candidate>..HEAD`). Use it as the target.
+
+Ask the user which **label** to apply to the MR. Always ask — do not assume a default, and do not infer one from the repo, ticket prefix, past MRs, or memory. Only skip the question when the user has explicitly named the label in the current request.
 
 ---
 
@@ -64,7 +82,7 @@ Ask the user which **label** to apply to the MR. Always ask — do not assume a 
 ```bash
 git push -u origin <BRANCH> \
   -o merge_request.create \
-  -o merge_request.target=master \
+  -o merge_request.target=<TARGET> \
   -o "merge_request.label=<LABEL>" \
   -o "merge_request.title=<TITLE>" \
   -o "merge_request.assignee=<ASSIGNEE>"
@@ -104,4 +122,5 @@ If the **## 🚀 MRs** heading is missing from today's note, stop and ask the us
 
 Print a summary:
 - GitLab MR URL
+- Target branch. If it isn't `master`, say the MR is stacked on that branch and that it must be retargeted to `master` once the base MR merges (GitLab does this automatically when the base branch is deleted on merge).
 - Daily note entry added (with or without Obsidian file link)

@@ -1,0 +1,26 @@
+theme = "dark"
+diff_view = "side-by-side"
+
+[[comment_types]]
+id = "issue"
+label = "Issue"
+definition = "Problem that should be fixed before merge"
+color = "red"
+
+[[comment_types]]
+id = "nit"
+label = "Nit"
+definition = "Minor style or naming suggestion"
+color = "gray"
+
+[[comment_types]]
+id = "suggestion"
+label = "Suggestion"
+definition = "Optional improvement worth considering"
+color = "blue"
+
+[[comment_types]]
+id = "praise"
+label = "Praise"
+definition = "Something done well"
+color = "green"

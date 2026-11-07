@@ -1,0 +1,9 @@
+# Files encrypted with git-crypt
+.ssh/id_rsa filter=git-crypt diff=git-crypt
+.ssh/id_rsa.pub filter=git-crypt diff=git-crypt
+work/.aliases.sh filter=git-crypt diff=git-crypt
+work/.aws/config filter=git-crypt diff=git-crypt
+work/.extended-routes filter=git-crypt diff=git-crypt
+work/cloudflared-proxy/config.yaml filter=git-crypt diff=git-crypt
+work/glab-cli/config.yml filter=git-crypt diff=git-crypt
+work/.gitconfig filter=git-crypt diff=git-crypt

@@ -1,9 +1,1 @@
 Brewfile.lock.json
-.gitsecret/keys/random_seed
-!*.secret
-flywire/.aws/config
-flywire/.extended-routes
-flywire/.tokens.sh
-.ssh/id_rsa
-.ssh/id_rsa.pub
-flywire/.aliases.sh

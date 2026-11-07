@@ -25,17 +25,16 @@ Commands:
   install-ohmyzsh       Install OhMyZSH
   install-homebrew      Install homebrew
   install-neovim        Install neovim
-  install-tmux          Install tmux
   gpg                   GPG
     ├── list-public-keys      List public GPG keys
     ├── list-secret-keys      List secret GPG keys
     ├── import-public-key     Import public GPG key
     ├── import-secret-key     Import secret GPG key
-  git-secret            git-secret
-    ├── add                   Add file for encrypting (TODO)
-    ├── reveal                Decrypt files for editing
-    ├── update                Re-encrypt files and cleanup decrypted versions
-    ├── copy                  Decrypt and setup secrets in "$HOME"
+  git-crypt             git-crypt
+    ├── unlock                Decrypt git-crypt files in the working tree
+    ├── lock                  Re-encrypt git-crypt files in the working tree
+    ├── status                List files encrypted by git-crypt
+    ├── copy                  Unlock and setup secrets in "$HOME"
   install-pass          Install pass
   help                  Display this help message
 ```
@@ -44,34 +43,28 @@ Commands:
 
 ## Encrypt data
 
-I use [git-secret](https://git-secret.io/) to store secrets that otherwise would be compromised
-within git versioning. Make sure that public/private [gpg](https://www.gnupg.org/) keys are stored in the machine beforehand.
+I use [git-crypt](https://github.com/AGWA/git-crypt) (GPG mode) to store secrets that otherwise would be compromised
+within git versioning. Files are encrypted on commit and decrypted transparently in the working tree once unlocked.
+Make sure that public/private [gpg](https://www.gnupg.org/) keys are stored in the machine beforehand.
+
+### Unlock after cloning
+
+```bash
+./bin/setup git-crypt unlock   # or: ./bin/setup git-crypt copy (unlock + link into $HOME)
+```
 
 ### New file to be added
 
-In order to add a new file for encrypting, you can type the following:
+Add the path to `.gitattributes` **before** staging the file:
 
 ```bash
-# Add file to the index of files tracked to be encrypted
-git-secret add <filename>
-# Encrypts all the files that have been added
-git-secret hide
+echo 'path/to/file filter=git-crypt diff=git-crypt' >> .gitattributes
+git add .gitattributes path/to/file
+./bin/setup git-crypt status   # confirm it is listed as encrypted
 ```
 
 ### Update existing file
 
-To edit encrypted files, use the reveal-edit-update workflow:
-
-```bash
-# 1. Decrypt files for editing
-./bin/setup git-secret reveal
-
-# 2. Edit your files
-vim flywire/.tokens.sh
-# ... make your changes
-
-# 3. Re-encrypt and cleanup
-./bin/setup git-secret update
-```
+Once unlocked, just edit the file and commit; git-crypt encrypts it automatically.
 
 Remember to push your changes back to this repository after updating.

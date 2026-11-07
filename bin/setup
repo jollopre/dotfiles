@@ -28,11 +28,66 @@ install_neovim() {
   cp -R nvim ~/.config
 }
 
-install_tmux() {
-  echo "Installing tmux..."
-  cp .tmux.conf ~
-  rm -rf ~/.tmux/plugins/tpm
-  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+install_tuicr() {
+  echo "Installing tuicr config..."
+  mkdir -p ~/.config/tuicr
+  cp tuicr/config.toml ~/.config/tuicr/config.toml
+}
+
+install_herdr() {
+  echo "Installing herdr config..."
+  mkdir -p ~/.config/herdr
+  cp herdr/config.toml ~/.config/herdr/config.toml
+}
+
+install_glab() {
+  echo "Installing glab config..."
+  mkdir -p ~/Library/Application\ Support/glab-cli
+  cp work/glab-cli/config.yml ~/Library/Application\ Support/glab-cli/config.yml
+  chmod 0600 ~/Library/Application\ Support/glab-cli/config.yml
+}
+
+: '
+Requires: curl, unzip, shasum
+Description: Install cloudflared-proxy from its GitHub release (latest by default) into ~/.local/bin.
+'
+install_cloudflared_proxy() {
+  local repo="sbldevnet/cloudflared-proxy"
+  local asset="cloudflared-proxy_darwin_all.zip"
+  local install_dir="$HOME/.local/bin"
+  local version="$1"
+
+  if [ -z "$version" ]; then
+    version=$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/$repo/releases/latest")
+    version="${version##*/}"
+  fi
+
+  if [[ ! "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Error: could not resolve a valid cloudflared-proxy version (got '$version')"
+    exit 1
+  fi
+
+  echo "Installing cloudflared-proxy $version..."
+  local tmp_dir
+  tmp_dir=$(mktemp -d)
+  trap 'rm -rf "$tmp_dir"' RETURN
+
+  local base_url="https://github.com/$repo/releases/download/$version"
+  curl -fsSL -o "$tmp_dir/$asset" "$base_url/$asset" || { echo "Error: download failed"; exit 1; }
+  curl -fsSL -o "$tmp_dir/checksums.txt" "$base_url/checksums.txt" || { echo "Error: checksums download failed"; exit 1; }
+
+  echo "Verifying checksum..."
+  (cd "$tmp_dir" && grep " $asset\$" checksums.txt | shasum -a 256 -c -) || { echo "Error: checksum mismatch"; exit 1; }
+
+  unzip -q "$tmp_dir/$asset" -d "$tmp_dir/extracted"
+  mkdir -p "$install_dir"
+  install -m 0755 "$tmp_dir/extracted/cloudflared-proxy" "$install_dir/cloudflared-proxy"
+
+  mkdir -p ~/.config/cloudflared-proxy
+  cp work/cloudflared-proxy/config.yaml ~/.config/cloudflared-proxy/config.yaml
+  chmod 0600 ~/.config/cloudflared-proxy/config.yaml
+
+  echo "cloudflared-proxy installed -> $install_dir/cloudflared-proxy"
 }
 
 
@@ -66,17 +121,19 @@ gpg_import_public_key() {
   rm public.key
 }
 
-# Centralized configuration for git-secret managed files
+# Centralized configuration for secret files
 # Format: "source_path:destination_path:is_symlink"
 # is_symlink: true = create symbolic link, false = copy file
-declare -a GIT_SECRET_FILES=(
-  "flywire/.aws:~/.aws:true"
-  "flywire/.extended-routes:~/.extended-routes:true"
-  "flywire/.tokens.sh:~/.tokens.sh:true"
-  "flywire/.aliases.sh:~/.aliases.sh:true"
+# All files are git-crypt encrypted (see .gitattributes)
+declare -a SECRET_FILES=(
+  "work/.aws/config:~/.aws/config:true"
+  "work/.extended-routes:~/.extended-routes:true"
+  "work/.aliases.sh:~/.aliases.sh:true"
+  "work/.gitconfig:~/.gitconfig-work:true"
   ".ssh/id_rsa:~/.ssh/id_rsa:false"
   ".ssh/id_rsa.pub:~/.ssh/id_rsa.pub:false"
 )
+
 
 gpg_import_secret_key() {
   local file_path="$1"
@@ -100,62 +157,49 @@ gpg_import_secret_key() {
   rm private.key
 }
 
-git_secret_add() {
-  echo "TODO"
+git_crypt_is_unlocked() {
+  [ -d "$(git rev-parse --git-dir)/git-crypt/keys" ]
 }
 
 : '
-Requires: setup gpg import-public-key, setup gpg import-secret-key
-Description: Reveal encrypted files for editing.
+Requires: git-crypt, setup gpg import-public-key, setup gpg import-secret-key
+Description: Decrypt git-crypt files in the working tree (one-off per clone).
 '
-git_secret_reveal() {
-  echo "Revealing all encrypted files for editing"
-  git-secret reveal -f
-
-  echo "Files decrypted and ready for editing:"
-  for entry in "${GIT_SECRET_FILES[@]}"; do
-    IFS=':' read -r source_path dest_path is_symlink <<< "$entry"
-
-    if [ -f "$source_path" ]; then
-      echo "  ✓ $source_path"
-    fi
-  done
-
-  echo ""
-  echo "After editing, run: setup git-secret update"
+git_crypt_unlock() {
+  if git_crypt_is_unlocked; then
+    echo "Repository already unlocked"
+    return
+  fi
+  echo "Unlocking git-crypt files with your GPG key"
+  git-crypt unlock
 }
 
 : '
-Requires: setup gpg import-public-key, setup gpg import-secret-key
-Description: Re-encrypt all files after updating and clean up decrypted files.
+Requires: git-crypt
+Description: Re-encrypt git-crypt files in the working tree (needs a clean working tree).
 '
-git_secret_update() {
-  echo "Re-encrypting all files after updating"
-  git-secret hide
-
-  echo "Cleaning up decrypted files to leave no traces"
-  for entry in "${GIT_SECRET_FILES[@]}"; do
-    IFS=':' read -r source_path dest_path is_symlink <<< "$entry"
-
-    if [ -f "$source_path" ]; then
-      echo "  Removing decrypted file: $source_path"
-      rm -f "$source_path"
-    fi
-  done
-
-  echo "Cleanup complete - no unencrypted files remaining"
+git_crypt_lock() {
+  echo "Locking git-crypt files"
+  git-crypt lock
 }
 
 : '
-Requires: setup gpg import-public-key, setup gpg import-secret-key
-Description: Link decrypted files for working directory. Also configures ssh.
+Requires: git-crypt
+Description: Show which files are encrypted by git-crypt.
 '
-git_secret_copy() {
-  echo "Decrypt all hidden files"
-  git-secret reveal
+git_crypt_status() {
+  git-crypt status -e
+}
+
+: '
+Requires: git-crypt, gpg, setup gpg import-public-key, setup gpg import-secret-key
+Description: Unlock secrets and link/copy them into $HOME. Also configures ssh.
+'
+git_crypt_copy() {
+  git_crypt_unlock
 
   echo "Setting up decrypted files using centralized configuration"
-  for entry in "${GIT_SECRET_FILES[@]}"; do
+  for entry in "${SECRET_FILES[@]}"; do
     IFS=':' read -r source_path dest_path is_symlink <<< "$entry"
 
     # Expand tilde in destination path
@@ -184,7 +228,7 @@ git_secret_copy() {
 }
 
 : '
-Requires: openssh, pass, setup git-secret copy
+Requires: openssh, pass, setup git-crypt copy
 Description: Install pass and configures the password store to my private github repository of password.
 '
 install_pass() {
@@ -227,17 +271,20 @@ usage() {
     echo "  install-ohmyzsh       Install OhMyZSH"
     echo "  install-homebrew      Install homebrew"
     echo "  install-neovim        Install neovim"
-    echo "  install-tmux          Install tmux"
+    echo "  install-tuicr         Install tuicr config"
+    echo "  install-herdr         Install herdr config"
+    echo "  install-glab          Install glab config"
+    echo "  install-cloudflared-proxy [vX.Y.Z]  Install cloudflared-proxy (latest by default)"
     echo "  gpg                   GPG"
     echo "    ├── list-public-keys      List public GPG keys"
     echo "    ├── list-secret-keys      List secret GPG keys"
     echo "    ├── import-public-key     Import public GPG key"
     echo "    ├── import-secret-key     Import secret GPG key"
-    echo "  git-secret            git-secret"
-    echo "    ├── add                   Add file for encrypting (TODO)"
-    echo "    ├── reveal                Decrypt files for editing"
-    echo "    ├── update                Re-encrypt files and cleanup decrypted versions"
-    echo "    ├── copy                  Decrypt and setup secrets in \"$HOME\""
+    echo "  git-crypt             git-crypt"
+    echo "    ├── unlock                Decrypt git-crypt files in the working tree"
+    echo "    ├── lock                  Re-encrypt git-crypt files in the working tree"
+    echo "    ├── status                List files encrypted by git-crypt"
+    echo "    ├── copy                  Unlock and setup secrets in \"$HOME\""
     echo "  install-pass          Install pass"
     echo "  install-skills        Symlink personal Claude skills into ~/.claude/skills"
     echo "  help                  Display this help message"
@@ -257,8 +304,17 @@ case "$1" in
   install-neovim)
     install_neovim
     ;;
-  install-tmux)
-    install_tmux
+  install-tuicr)
+    install_tuicr
+    ;;
+  install-herdr)
+    install_herdr
+    ;;
+  install-glab)
+    install_glab
+    ;;
+  install-cloudflared-proxy)
+    install_cloudflared_proxy "$2"
     ;;
   gpg)
     case "$2" in
@@ -280,22 +336,22 @@ case "$1" in
         ;;
     esac
     ;;
-  git-secret)
+  git-crypt)
     case "$2" in
-      add)
-        git_secret_add
+      unlock)
+        git_crypt_unlock
         ;;
-      reveal)
-        git_secret_reveal
+      lock)
+        git_crypt_lock
         ;;
-      update)
-        git_secret_update
+      status)
+        git_crypt_status
         ;;
       copy)
-        git_secret_copy
+        git_crypt_copy
         ;;
       *)
-        echo "Invalid subcommand for git-secret"
+        echo "Invalid subcommand for git-crypt"
         usage
         ;;
     esac
