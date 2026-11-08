@@ -7,6 +7,9 @@ ruby = "3.4.12"
 # Release checksum and GitHub artifact attestation are verified on install
 "github:sbldevnet/cloudflared-proxy" = "1.0.1"
 
+[env]
+_.source = { path = "~/dotfiles/work/secrets.sh", redact = true }
+
 [settings]
 # Honour per-project .ruby-version files
 idiomatic_version_file_enable_tools = ["ruby"]

@@ -7,3 +7,4 @@ work/.extended-routes filter=git-crypt diff=git-crypt
 work/cloudflared-proxy/config.yaml filter=git-crypt diff=git-crypt
 work/glab-cli/config.yml filter=git-crypt diff=git-crypt
 work/.gitconfig filter=git-crypt diff=git-crypt
+work/secrets.sh filter=git-crypt diff=git-crypt
