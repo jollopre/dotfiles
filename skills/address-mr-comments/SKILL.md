@@ -5,6 +5,7 @@ allowed-tools:
   - Bash(glab *)
   - Bash(git *)
   - Bash(jq *)
+  - Bash(lsof -nP -iTCP:8888 -sTCP:LISTEN)
   - Read
   - Edit
   - Write
@@ -22,6 +23,8 @@ Work through the review comments on a merge request one item at a time. The user
 
 Use `glab` only. Run it inside the repo clone, where `:id` resolves to the project from the git remote. If `:id` fails (for example when the remote uses an SSH host alias), use the URL-encoded project path instead, such as `projects/group%2Fsubgroup%2Fproject/...`.
 
+The GitLab instance sits behind an access proxy, so API calls must go through a local tunnel. The `glab` shell wrapper in `~/.aliases.sh` sends them there, and the glab config adds the auth header. If a call fails with `invalid character '<'` (an HTML login page instead of JSON), the request didn't go through the tunnel. Check that the tunnel is running, that the GitLab token hasn't expired, and that `glab` resolves to the wrapper (`type glab`).
+
 | Action | Command |
 |---|---|
 | List discussions | `glab api "projects/:id/merge_requests/<IID>/discussions?per_page=20&page=<N>"` |
@@ -38,6 +41,10 @@ Page through discussions in small pages: `per_page=100` can return HTTP 502 whil
 ## Workflow
 
 Do the steps in order. Stop after each step marked **(wait)** until the user answers.
+
+### 0. Check the tunnel
+
+Before any `glab` call, check that `cloudflared-proxy` is listening on the port the `glab` wrapper uses: `lsof -nP -iTCP:8888 -sTCP:LISTEN`. If nothing is listening, stop and tell the user the tunnel isn't running and that they can start it with `cloudflared-proxy run`. Don't start, restart or work around it yourself. Wait until the user says it's up, then check again.
 
 ### 1. Fetch
 
