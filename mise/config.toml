@@ -7,9 +7,6 @@ ruby = "3.4.12"
 # Release checksum and GitHub artifact attestation are verified on install
 "github:sbldevnet/cloudflared-proxy" = "1.0.1"
 
-[env]
-_.source = { path = "~/dotfiles/work/secrets.sh", redact = true }
-
 [settings]
 # Honour per-project .ruby-version files
 idiomatic_version_file_enable_tools = ["ruby"]
@@ -33,6 +30,7 @@ run = "brew bundle check --file ~/dotfiles/Brewfile >/dev/null || brew bundle --
 "~/.config/nvim" = { source = "~/dotfiles/nvim" }
 "~/.config/tuicr/config.toml" = { source = "~/dotfiles/tuicr/config.toml" }
 "~/.config/herdr/config.toml" = { source = "~/dotfiles/herdr/config.toml" }
+"~/.gnupg/gpg-agent.conf" = { source = "~/dotfiles/gnupg/gpg-agent.conf" }
 # One entry per skill: symlink-each would link every file inside, not the folder
 "~/.claude/skills/address-mr-comments" = { source = "~/dotfiles/skills/address-mr-comments" }
 "~/.claude/skills/clean-rspec-output" = { source = "~/dotfiles/skills/clean-rspec-output" }
