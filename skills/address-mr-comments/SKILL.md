@@ -89,7 +89,7 @@ For each item, in the order the user chose:
    - With the fix, list each path that reaches the changed code (for example the validation, the HTTP request, stored data read back) and whether a spec covers it, so the user doesn't have to ask.
    - Follow the repo's own conventions. Read its `CLAUDE.md` and the docs that cover the code.
    - Run the targeted specs and the linter, then show `git diff`.
-4. **Draft the reply.** Post it only when the user has approved that exact text, then **quote the reply as posted**. If the user approves but changes what the reply must say (for example, "track it in MR 5 instead"), show the revised draft and wait again. Post right away only if the approved draft goes out unchanged. A reply about a local fix that isn't pushed yet should say it comes in the next push.
+4. **Draft the reply.** Skip this for items from a summary note (see step 5). Post it only when the user has approved that exact text, then **quote the reply as posted**. If the user approves but changes what the reply must say (for example, "track it in MR 5 instead"), show the revised draft and wait again. Post right away only if the approved draft goes out unchanged. A reply about a local fix that isn't pushed yet should say it comes in the next push.
 5. **Resolve** only when the user says so.
 6. **Point to the next item.** End the turn by showing the next unresolved item in full, as in step 1, and ask whether to go ahead.
 
@@ -103,9 +103,9 @@ If a posted reply turns out to be wrong, offer two options and let the user pick
 
 Before deleting, fetch the thread and check that the note id belongs to the user's reply, not to the reviewer's note.
 
-### 5. Answer notes that can't be resolved
+### 5. Items from a summary note
 
-Answer all the items from one summary note in a single reply on that thread, once every one of them is settled. Give one bullet per item, with what was done or why it wasn't. Resolve the thread only if it's resolvable and the user says so.
+Items split out of a summary note (nitpicks, suggestions) have no thread of their own, so don't draft or post a reply for them, and skip the reply and resolve steps (4 and 5) in step 3. Settle each one locally (fix, follow-up or no change) and list the outcome in the final report. Post on the summary note only if the user asks for it.
 
 ### 6. Finish (wait before each external action)
 

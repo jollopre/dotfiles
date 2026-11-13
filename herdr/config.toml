@@ -9,11 +9,12 @@ sidebar_collapsed_mode = "hidden"
 sidebar_start_collapsed = true
 tab_bar_right = [
   { type = "zoom" },
+  { type = "command", command = "pmset -g batt | grep -o '[0-9]*%'", interval_seconds = 60, timeout_seconds = 5 },
   { type = "hostname" },
   { type = "datetime", format = "%Y-%m-%d %H:%M" },
   { type = "command", command = "git branch --show-current 2>/dev/null || true", interval_seconds = 30, timeout_seconds = 5 },
 ]
-tab_bar_right_separator = " · "
+tab_bar_right_separator = "  "
 
 [ui.toast]
 delivery = "terminal"
