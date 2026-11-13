@@ -8,6 +8,7 @@ cask "spotify"
 
 brew "awscli"
 brew "curl"
+brew "duckdb"
 brew "git"
 brew "git-crypt"
 brew "go"
