@@ -77,7 +77,42 @@ Ask the user which **label** to apply to the MR. Always ask — do not assume a 
 
 ---
 
-### Step 3 — Push and create MR
+### Step 3 — Comprehension check
+
+Before pushing, quiz the user on the changes to confirm they understand them well enough to ship.
+
+Read the full diff against the target:
+```bash
+git diff --stat origin/<TARGET>...HEAD
+git diff origin/<TARGET>...HEAD
+```
+
+Decide how many questions to ask, **between 3 and 5**:
+- **3** for small, low-risk changes (config tweaks, renames, docs, isolated fixes).
+- **4–5** for larger diffs or changes touching critical paths: payments, auth, data migrations, concurrency, external integrations, security-sensitive code, or performance-sensitive code.
+
+Build the questions from the actual diff. Cover the dimensions that matter most for this change:
+- **Edge cases**: empty/nil inputs, boundaries, retries, partial failures, ordering.
+- **What could break**: callers, backwards compatibility, rollout and rollback, data already in production.
+- **Security**: input validation, authorization, secrets, injection, sensitive data in logs.
+- **Performance**: N+1 queries, unbounded loops or loads, locking, hot paths.
+- **Pattern used**: why this approach over the alternatives, and what it trades off.
+
+Rules:
+- Ask **one question at a time** and wait for the answer before asking the next. Never batch them.
+- Ground each question in a behaviour the diff changes. No generic trivia. Name the change (a file or a flow), not the method or line that holds the answer: finding it is part of the reasoning.
+- Don't hint at the answer in the question:
+  - Don't presuppose the conclusion. "What would go wrong if X and Y were swapped?", "Which inputs reach the span unmasked?" and "What keeps callers from running X?" each say there is a problem and where it is. Ask "Does the order of X and Y matter?", "What ends up on the span for a PAN?", "Can existing callers reach the new steps?".
+  - Don't name the edge case, scenario or failure mode you want the user to find (e.g. "suppose no span is open"). Describe the change and ask what could break or what it affects.
+  - Don't point at the helper whose code gives the answer away (e.g. "look at `mask_value`").
+  - Before asking, reread the question. If it names where the answer is, assumes a problem exists, or narrows to the one case that matters, rewrite it.
+- Code references belong in the feedback after the answer, not in the question.
+- After each answer, give brief feedback. If it's correct, say so. If it's incomplete or wrong, explain the gap and point to the relevant code, then move on.
+- After the last question, summarise any gaps found and ask whether to proceed with the push, or stop so the user can address them. Only continue to Step 4 on explicit confirmation.
+
+---
+
+### Step 4 — Push and create MR
 
 ```bash
 git push -u origin <BRANCH> \
@@ -96,7 +131,7 @@ remote:   https://$GITLAB_HOST/.../merge_requests/NNNN
 
 ---
 
-### Step 4 — Add entry to today's Daily Note
+### Step 5 — Add entry to today's Daily Note
 
 Delegate to the `obsidian` skill's Daily Note workflow to locate and edit today's note. Append a new entry under the **## 🚀 MRs** heading using the format:
 
@@ -118,7 +153,7 @@ If the **## 🚀 MRs** heading is missing from today's note, stop and ask the us
 
 ---
 
-### Step 5 — Report results
+### Step 6 — Report results
 
 Print a summary:
 - GitLab MR URL
