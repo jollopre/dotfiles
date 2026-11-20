@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#MISE description="Run a command with work registry credentials"
+#MISE depends=["work:login"]
+#MISE dir="{{cwd}}"
+set -euo pipefail
+
+source ~/dotfiles/work/aws.env
+source ~/dotfiles/work/secrets.sh
+
+AWS_CODEARTIFACT_TOKEN="$(aws codeartifact get-authorization-token \
+  --domain "$WORK_CODEARTIFACT_DOMAIN" --domain-owner "$WORK_ARTIFACTS_ACCOUNT" \
+  --query authorizationToken --output text --profile "$WORK_CODEARTIFACT_PROFILE")"
+export AWS_CODEARTIFACT_TOKEN
+
+exec "$@"

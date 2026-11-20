@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#MISE description="Log in to AWS SSO (only if the session expired) and the shared ECR registry"
+set -euo pipefail
+
+source ~/dotfiles/work/aws.env
+
+aws sts get-caller-identity --profile "$WORK_ECR_PROFILE" >/dev/null 2>&1 \
+  || aws sso login --sso-session "$WORK_SSO_SESSION"
+
+region="$(aws configure get region --profile "$WORK_ECR_PROFILE")"
+aws ecr get-login-password --profile "$WORK_ECR_PROFILE" \
+  | docker login --username AWS --password-stdin \
+    "$WORK_ARTIFACTS_ACCOUNT.dkr.ecr.$region.amazonaws.com"
