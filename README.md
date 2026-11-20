@@ -28,8 +28,8 @@ Terminal.app profile. Preview any run with `--dry-run`.
 3. Import the GPG keys, then bootstrap the secrets:
 
 ```bash
-mise run gpg:import-public-key /path/to/public-key
-mise run gpg:import-secret-key /path/to/secret-key
+mise run dot:gpg:import-public-key /path/to/public-key
+mise run dot:gpg:import-secret-key /path/to/secret-key
 mise -E secrets bootstrap
 ```
 
@@ -41,17 +41,17 @@ Later runs only need `mise bootstrap` (or `mise -E secrets bootstrap`): parts al
 ## Tasks
 
 ```
-mise tasks
+mise tasks --global
 ```
 
-| Task                    | Description                                                    |
-| ----------------------- | -------------------------------------------------------------- |
-| `gpg:import-public-key` | Decrypt and import a GPG public key                            |
-| `gpg:import-secret-key` | Decrypt and import the GPG secret key, and trust it ultimately |
-| `git-crypt:unlock`      | Decrypt git-crypt files in the working tree (no-op if unlocked)|
-| `git-crypt:lock`        | Re-encrypt git-crypt files (needs a clean working tree)        |
-| `git-crypt:status`      | List files encrypted by git-crypt                              |
-| `terminal-profile`      | Install the Dracula Terminal.app profile as default            |
+| Task                        | Description                                                         |
+| --------------------------- | ------------------------------------------------------------------- |
+| `dot:gpg:import-public-key` | Decrypt and import a GPG public key                                 |
+| `dot:gpg:import-secret-key` | Decrypt and import the GPG secret key, and trust it ultimately      |
+| `dot:git-crypt:unlock`      | Decrypt git-crypt files in the working tree (no-op if unlocked)     |
+| `dot:git-crypt:lock`        | Re-encrypt git-crypt files (needs a clean working tree)             |
+| `dot:git-crypt:status`      | List files encrypted by git-crypt                                   |
+| `dot:terminal-profile`      | Install the Dracula Terminal.app profile as default (hidden)        |
 
 ## Add a dotfile
 
@@ -76,7 +76,7 @@ mise does not know about git-crypt: it deploys whatever is on disk. That is why 
 ### Unlock after cloning
 
 ```bash
-mise run git-crypt:unlock   # or: mise -E secrets bootstrap (unlock + deploy into $HOME)
+mise run dot:git-crypt:unlock   # or: mise -E secrets bootstrap (unlock + deploy into $HOME)
 ```
 
 ### New file to be added
@@ -86,7 +86,7 @@ Add the path to `.gitattributes` **before** staging the file:
 ```bash
 echo 'path/to/file filter=git-crypt diff=git-crypt' >> .gitattributes
 git add .gitattributes path/to/file
-mise run git-crypt:status   # confirm it is listed as encrypted
+mise run dot:git-crypt:status   # confirm it is listed as encrypted
 ```
 
 ### Update existing file

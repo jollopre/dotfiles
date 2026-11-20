@@ -42,8 +42,9 @@ run = "brew bundle check --file ~/dotfiles/Brewfile >/dev/null || brew bundle --
 
 # Runs on every `mise bootstrap`, so each step must be safe to repeat
 [tasks.bootstrap]
+hide = true
 description = "Create workspace folders and set the Terminal.app profile"
 run = [
   "mkdir -p ~/gitlab ~/github",
-  "mise run terminal-profile",
+  "mise run dot:terminal-profile",
 ]

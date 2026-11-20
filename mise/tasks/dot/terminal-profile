@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#MISE hide=true
 #MISE description="Install the Dracula Terminal.app profile and make it the default"
 #USAGE flag "-f --force" help="Re-import even if Dracula is already the default"
 # Requires: macOS Terminal.app, curl, shasum
