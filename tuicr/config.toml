@@ -1,26 +1,40 @@
-theme = "dark"
+theme = "github-dark"
 diff_view = "side-by-side"
+wrap = true
+wrap_style = "gutter"
+transparent_background = false
+scroll_offset = 5
+compact_folders = true
+show_file_list = false
+single_file_view = true
+diff_watch_interval_ms = 2000
 
 [[comment_types]]
 id = "issue"
 label = "Issue"
-definition = "Problem that should be fixed before merge"
+definition = "Blocking problem that must be fixed before merge"
 color = "red"
-
-[[comment_types]]
-id = "nit"
-label = "Nit"
-definition = "Minor style or naming suggestion"
-color = "gray"
 
 [[comment_types]]
 id = "suggestion"
 label = "Suggestion"
-definition = "Optional improvement worth considering"
+definition = "Optional improvement: implement it or explain why not"
 color = "blue"
+
+[[comment_types]]
+id = "note"
+label = "Question"
+definition = "Question or remark: answer or acknowledge, no code change required"
+color = "yellow"
 
 [[comment_types]]
 id = "praise"
 label = "Praise"
-definition = "Something done well"
+definition = "Something done well: no action required"
 color = "green"
+
+[[comment_types]]
+id = "nit"
+label = "Nit"
+definition = "Minor style or naming tweak: apply if trivial, otherwise skip"
+color = "gray"
